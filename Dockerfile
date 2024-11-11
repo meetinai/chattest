@@ -1,4 +1,5 @@
-FROM ghcr.io/open-webui/open-webui:git-7228b39
+# Use the base image
+FROM ghcr.io/open-webui/open-webui:git-7228b39 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -11,10 +12,20 @@ RUN sed -i "s|samesite=WEBUI_SESSION_COOKIE_SAME_SITE|samesite='none'|g" backend
 
 # Install dependencies
 RUN pip install "litellm[proxy]==1.51.2" && \
-    chown -R 1000:0 /app
+    chown -R 10000:0 /app  # Change ownership to a user with UID 10000
+
+# Create a non-privileged user
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid 10014 \
+    "choreo"
 
 # Switch to non-root user
-USER 1000:0
+USER 10014:0  # Adjusted user UID
 
 # Copy necessary files into the container
 COPY ./azure-models.txt /assets/azure-models.txt
