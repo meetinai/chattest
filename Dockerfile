@@ -1,5 +1,7 @@
 FROM ghcr.io/open-webui/open-webui:git-7228b39
 
+ENV TRIVY_DISABLE_VEX_NOTICE=true
+
 WORKDIR /app
 
 USER 0:0
