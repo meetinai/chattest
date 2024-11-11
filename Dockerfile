@@ -14,16 +14,14 @@ RUN adduser \
     --uid 10014 \
     "choreo"
 
-RUN pip install "litellm[proxy]==1.51.2" && \
-    chown -R choreo:choreo /app
+RUN pip install "litellm[proxy]==1.51.2"
+
+# Copy files and set permissions while still root
+COPY ./azure-models.txt /assets/azure-models.txt
+COPY ./start.sh /start.sh
+RUN chown -R choreo:choreo /app /assets/azure-models.txt /start.sh
 
 # Switch to non-root user
 USER 10014
-
-COPY ./azure-models.txt /assets/azure-models.txt
-COPY ./start.sh /start.sh
-
-# Set proper permissions for copied files
-RUN chown choreo:choreo /assets/azure-models.txt /start.sh
 
 CMD [ "bash", "/start.sh" ]
